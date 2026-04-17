@@ -1,8 +1,6 @@
 package br.com.fatec.api.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,25 +17,33 @@ import br.com.fatec.api.dto.CategoriaRequestDTO;
 import br.com.fatec.api.dto.CategoriaResponseDTO;
 import br.com.fatec.api.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/categorias")
+@Tag(name = "Categorias", description = "cadastro e listagem paginada de categorias.")
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaService service;
+    private final CategoriaService service;
 
-    @Operation(summary = "Listar categorias com paginação", description = "Retorna uma lista de todas as categorias disponíveis.")
-    @GetMapping
-    public ResponseEntity<List<CategoriaResponseDTO>> listarPaginado(
-            @RequestParam(required = false) String nome,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
-        return ResponseEntity.ok(service.listarTodosPaginado(nome, page, size).getContent());
+    public CategoriaController(CategoriaService service) {
+        this.service = service;
     }
 
-    @Operation(summary = "Buscar uma categoria por ID", description = "Retorna os detalhes de uma categoria específica com base no ID fornecido.")
+    @Operation(
+            summary = "Listar categorias com paginacao",
+            description = "Retorna categorias paginadas e ordenadas por nome, com filtro opcional por nome."
+    )
+    @GetMapping
+    public ResponseEntity<Page<CategoriaResponseDTO>> listarPaginado(
+            @RequestParam(required = false) String nome,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(service.listarTodosPaginado(nome, page, size));
+    }
+
+    @Operation(summary = "Buscar uma categoria por ID", description = "Retorna os detalhes de uma categoria especifica com base no ID fornecido.")
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> buscar(@PathVariable Long id) {
         return service.buscarPorId(id)
@@ -45,13 +51,13 @@ public class CategoriaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar uma nova categoria", description = "Permite criar uma nova categoria fornecendo os detalhes necessários.")
+    @Operation(summary = "Criar uma nova categoria", description = "Cadastra uma nova categoria.")
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> criar(@Valid @RequestBody CategoriaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.salvar(dto));
     }
 
-    @Operation(summary = "Atualizar uma categoria por ID", description = "Permite atualizar os detalhes de uma categoria existente com base no ID fornecido.")
+    @Operation(summary = "Atualizar uma categoria por ID", description = "Atualiza uma categoria existente com base no ID fornecido.")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id,
             @Valid @RequestBody CategoriaRequestDTO dto) {
@@ -59,12 +65,10 @@ public class CategoriaController {
         return ResponseEntity.ok(atualizado);
     }
 
-    @Operation(summary = "Excluir uma categoria por ID", description = "Permite excluir uma categoria existente com base no ID fornecido.")
+    @Operation(summary = "Excluir uma categoria por ID", description = "Exclui uma categoria existente com base no ID fornecido.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

@@ -4,6 +4,7 @@ import br.com.fatec.api.dto.ProdutoRequestDTO;
 import br.com.fatec.api.dto.ProdutoResponseDTO;
 import br.com.fatec.api.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/produtos") // Prefixo da rota
+@RequestMapping("/api/produtos")
+@Tag(name = "Produtos", description = "cadastro e listagem paginada de produtos.")
 public class ProdutoController {
 
     @Autowired

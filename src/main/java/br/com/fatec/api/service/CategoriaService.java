@@ -3,10 +3,10 @@ package br.com.fatec.api.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.com.fatec.api.dto.CategoriaRequestDTO;
@@ -17,33 +17,33 @@ import br.com.fatec.api.repository.CategoriaRepository;
 @Service
 public class CategoriaService {
 
-    @Autowired
-    private CategoriaRepository repository;
+    private final CategoriaRepository repository;
+
+    public CategoriaService(CategoriaRepository repository) {
+        this.repository = repository;
+    }
 
     public List<CategoriaResponseDTO> listarTodos() {
-        return repository.findAll()
+        return repository.findAll(Sort.by("id").ascending())
                 .stream()
                 .map(CategoriaResponseDTO::fromEntity)
                 .toList();
     }
 
     public Page<CategoriaResponseDTO> listarTodosPaginado(String nome, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Categoria> categorias = (nome != null && !nome.isBlank())
                 ? repository.findByNomeContainingIgnoreCase(nome, pageable)
                 : repository.findAll(pageable);
 
-        return categorias
-                .map(CategoriaResponseDTO::fromEntity);
+        return categorias.map(CategoriaResponseDTO::fromEntity);
     }
 
-    // Buscar por ID: Retorna Optional de DTO
     public Optional<CategoriaResponseDTO> buscarPorId(Long id) {
         return repository.findById(id)
                 .map(CategoriaResponseDTO::fromEntity);
     }
 
-    // Salvar: Recebe RequestDTO -> Converte para Entity -> Salva -> Retorna ResponseDTO
     public CategoriaResponseDTO salvar(CategoriaRequestDTO dto) {
         Categoria categoria = new Categoria();
         categoria.setNome(dto.nome());
@@ -52,10 +52,9 @@ public class CategoriaService {
         return CategoriaResponseDTO.fromEntity(salvo);
     }
 
-    // Atualizar: O ponto onde geralmente ocorre o erro de tipos
     public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO dto) {
         Categoria existente = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new RuntimeException("Categoria nao encontrada"));
 
         existente.setNome(dto.nome());
 
@@ -65,9 +64,8 @@ public class CategoriaService {
 
     public void deletar(Long id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Categoria não encontrada");
+            throw new RuntimeException("Categoria nao encontrada");
         }
         repository.deleteById(id);
     }
-
 }
