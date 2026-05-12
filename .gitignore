@@ -40,6 +40,7 @@ logs/
 # Segurança e Ambiente
 .env
 application.properties
+application.properties.example.properties
 application.yml
 
 # OS

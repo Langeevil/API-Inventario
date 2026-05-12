@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -25,4 +27,9 @@ public class Produto {
     @NotNull(message = "O preço é obrigatório")
     @Positive(message = "O preço deve ser um valor positivo maior que zero")
     private Double preco;
+
+    @ManyToOne
+    @JoinColumn(name = "id_categoria") // Chave estrangeira para Categoria
+    private Categoria categoria;
+
 }
