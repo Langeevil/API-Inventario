@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UsuarioRequestDTO(
@@ -17,9 +18,13 @@ public record UsuarioRequestDTO(
         @Email(message = "Formato de email invalido")
         String email,
 
-        @Schema(example = "senha123")
+        @Schema(example = "Senha@123")
         @NotBlank(message = "A senha e obrigatoria")
-        @Size(min = 6, message = "A senha deve ter no minimo 6 caracteres")
+        @Size(min = 8, message = "A senha deve ter no minimo 8 caracteres")
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S+$",
+                message = "A senha deve ter letra maiuscula, letra minuscula, numero, caractere especial e nao pode conter espacos"
+        )
         String senha,
 
         @NotNull(message = "O perfil (role) e obrigatorio")

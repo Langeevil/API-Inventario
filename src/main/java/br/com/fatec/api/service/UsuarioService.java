@@ -2,6 +2,7 @@ package br.com.fatec.api.service;
 
 import br.com.fatec.api.dto.UsuarioRequestDTO;
 import br.com.fatec.api.dto.UsuarioResponseDTO;
+import br.com.fatec.api.dto.LoginRequestDTO;
 import br.com.fatec.api.model.Usuario;
 import br.com.fatec.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,16 @@ public class UsuarioService {
         usuario.setRole(dto.role());
 
         return UsuarioResponseDTO.fromEntity(repository.save(usuario));
+    }
+
+    public UsuarioResponseDTO autenticar(LoginRequestDTO dto) {
+        Usuario usuario = repository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("Usuario ou senha invalidos"));
+
+        if (!passwordEncoder.matches(dto.senha(), usuario.getSenha())) {
+            throw new RuntimeException("Usuario ou senha invalidos");
+        }
+
+        return UsuarioResponseDTO.fromEntity(usuario);
     }
 }

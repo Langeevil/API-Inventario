@@ -19,7 +19,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (usuarioRepository.count() == 0) {
+        if (!usuarioRepository.existsByEmail("admin@fatec.sp.gov.br")) {
             Usuario admin = new Usuario();
             admin.setNome("Administrador");
             admin.setEmail("admin@fatec.sp.gov.br");
